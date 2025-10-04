@@ -1,0 +1,45 @@
+
+    .dashboard-container {
+
+      border-radius: 5px;
+      padding: 40px;
+      text-align: center;
+      height: auto;
+      margin-top: 30px;
+    }
+    .navbar-custom {
+      background-color: #0047FF; 
+    }
+    .btn-custom {
+      min-width: 180px;
+      margin: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .btn-custom i {
+      margin-right: 8px;
+    }
+
+      @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+ 
+    .fade-in-card {
+      animation: fadeIn 3s ease forwards;
+    }
+
+  
+    @media (max-width: 768px) {
+      table {
+        font-size: 14px;
+      }
+    }
+    @media (max-width: 576px) {
+      table {
+        font-size: 12px;
+      }
+    }
+
+    

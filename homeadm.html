@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+<meta name="robots" content="index, follow">
+
+  <title>Admin Home</title>
+  <link rel="stylesheet" href="admin.css">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+
+  
+<nav class="navbar navbar-dark bg-primary">
+  <div class="container-fluid">
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <span class="navbar-brand fw-bold mx-3">Admin</span>
+    <a href="index.html" class="ms-auto text-white text-decoration-none">
+      <i class="bi bi-power"></i> Logout
+    </a>
+  </div>
+</nav>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Menu</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <div class="text-center p-3 border-bottom">
+      <img id="studentPic" src="logo.jpg" alt="Profile" class="rounded-circle mb-2" width="80" height="80">
+      <h6 id="welcomeMsg"></h6>
+    </div>
+    <div class="list-group list-group-flush" id="menuList">
+      <button class="list-group-item list-group-item-action text-start menu-btn"
+              data-page="studentRecordsPage" onclick="showPage('studentRecordsPage')" data-bs-dismiss="offcanvas">
+        <i class="bi bi-person-fill me-2"></i> Student Records
+      </button>
+      <button class="list-group-item list-group-item-action text-start menu-btn"
+              data-page="announcementPage" onclick="showPage('announcementPage')" data-bs-dismiss="offcanvas">
+        <i class="bi bi-megaphone-fill me-2"></i> Announcement
+      </button>
+      <button class="list-group-item list-group-item-action text-start menu-btn"
+              data-page="servicePage" onclick="showPage('servicePage')" data-bs-dismiss="offcanvas">
+        <i class="bi bi-file-earmark-text-fill me-2"></i> View Requests
+      </button>
+      <button class="list-group-item list-group-item-action text-start menu-btn"
+              data-page="gradesPage" onclick="showPage('gradesPage')" data-bs-dismiss="offcanvas">
+        <i class="bi bi-journal-bookmark-fill me-2"></i> Grades
+      </button>
+      <button class="list-group-item list-group-item-action text-start menu-btn"
+              data-page="clearancePage" onclick="showPage('clearancePage')" data-bs-dismiss="offcanvas">
+        <i class="bi bi-check2-square me-2"></i> Clearance
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+
+  <div id="defaultPage">
+    <h3>Welcome, Admin</h3>
+  </div>
+
+
+  <div id="studentRecordsPage" class="d-none">
+    <h3 class="fw-bold">Student Records</h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#" onclick="showPage('defaultPage')">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Student Records</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex gap-2 mb-3">
+      <button id="addStudentBtn" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Student</button>
+      <button id="editStudentBtn" class="btn btn-warning"><i class="bi bi-pencil"></i> Edit Student</button>
+      <button id="deleteStudentBtn" class="btn btn-danger"><i class="bi bi-trash"></i> Delete Student</button>
+    </div>
+
+    <div id="studentFormSection" class="d-none">
+      <div class="card p-3 shadow-sm mb-3">
+        <input type="hidden" id="docId">
+        <div class="row">
+          <div class="col-md-4 mb-2">
+            <label>Student ID</label>
+            <input id="studentId" type="text" class="form-control">
+            <small id="idWarning" class="text-danger d-none">ID already exists!</small>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label>Password</label>
+            <input id="studentPass" type="password" class="form-control">
+          </div>
+          <div class="col-md-4 mb-2">
+            <label>First Name</label>
+            <input id="firstName" type="text" class="form-control">
+          </div>
+          <div class="col-md-4 mb-2">
+            <label>Last Name</label>
+            <input id="lastName" type="text" class="form-control">
+          </div>
+          <div class="col-md-4 mb-2">
+            <label>Strand</label>
+            <select id="strand" class="form-select">
+              <option>ICT</option>
+              <option>STEM</option>
+              <option>ABM</option>
+              <option>GAS</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label>Year</label>
+            <select id="year" class="form-select">
+              <option>11</option>
+              <option>12</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+          <button id="saveStudentBtn" class="btn btn-success">Save</button>
+          <button id="updateStudentBtn" class="btn btn-warning d-none">Update</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3 d-flex gap-2">
+      <input type="text" id="searchInput" placeholder="Search student by name or ID" class="form-control">
+      <select id="strandFilter" class="form-select">
+        <option value="">All Strands</option>
+        <option>ICT</option>
+        <option>STEM</option>
+        <option>ABM</option>
+        <option>GAS</option>
+      </select>
+      <select id="yearFilter" class="form-select">
+        <option value="">All Years</option>
+        <option>11</option>
+        <option>12</option>
+      </select>
+      <button id="searchButton" class="btn btn-primary">Search</button>
+    </div>
+
+    <!-- Responsive Table -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Student List</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered text-center align-middle" id="studentsTable">
+            <thead class="table-light">
+              <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>ID</th>
+                <th>First</th>
+                <th>Last</th>
+                <th>Strand</th>
+                <th>Year</th>
+                <th>Password</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card mt-4 p-3 shadow-sm text-center">
+  <div class="mb-2 d-flex justify-content-center">
+  </div>
+  <button id="generateQrBtn" class="btn btn-primary mb-3">Generate QR</button>
+  <div id="qrCanvas" class="mx-auto mb-3"></div>
+  <div class="d-flex justify-content-center gap-2">
+    <button id="downloadPngBtn" class="btn btn-success btn-sm">Download PNG</button>
+    <button id="downloadJpegBtn" class="btn btn-warning btn-sm">Download JPEG</button>
+    <button id="printPdfBtn" class="btn btn-danger btn-sm">Print PDF</button>
+  </div>
+</div>
+
+  </div> 
+
+  
+
+
+
+  <div id="announcementPage" class="d-none container mt-4">
+    <h3 class="fw-bold">Announcements</h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#" onclick="showPage('defaultPage')">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Announcements</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex gap-2 mb-3">
+      <button id="addAnnouncementBtn" class="btn btn-primary">Create Announcement</button>
+      <button id="editAnnouncementBtn" class="btn btn-warning">Edit Announcement</button>
+      <button id="deleteAnnouncementBtn" class="btn btn-danger">Delete Announcement</button>
+    </div>
+
+    <div id="announcementFormSection" class="card p-3 shadow-sm mb-3 d-none">
+  <input type="hidden" id="announcementId">
+
+  <div class="mb-2">
+    <label>Title</label>
+    <input id="announcementTitle" type="text" class="form-control">
+  </div>
+
+  <div class="mb-2">
+    <label>Content</label>
+    <textarea id="announcementContent" class="form-control"></textarea>
+  </div>
+
+  <div class="mb-2">
+    <label>Date</label>
+    <input id="announcementDate" type="date" class="form-control">
+  </div>
+
+  <button id="saveAnnouncementBtn" class="btn btn-primary">Save</button>
+  <button id="updateAnnouncementBtn" class="btn btn-warning d-none">Update</button>
+</div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Announcement List</h5>
+        <div class="table-responsive">
+          <table id="announcementTable" class="table table-bordered">
+            <thead>
+              <tr>
+                <th><input type="checkbox" onclick="document.querySelectorAll('.announcement-checkbox').forEach(cb => cb.checked = this.checked)"></th>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>QR</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="modal fade" id="announcementQrModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Announcement QR Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="announcementQrContainer"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex gap-2 mx-auto">
+          <button id="announcementDownloadPngBtn" class="btn btn-success btn-sm">Download PNG</button>
+          <button id="announcementDownloadJpegBtn" class="btn btn-warning btn-sm">Download JPEG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+  <div id="servicePage" class="d-none container mt-4">
+    <h3 class="fw-bold">Service Requests</h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#" onclick="showPage('defaultPage')">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Service Requests</li>
+      </ol>
+    </nav>
+
+    <div class="table-responsive mt-3">
+      <table class="table table-bordered" id="requestsTable" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Request Type</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="gradesPage" class="d-none container mt-4">
+    <h3>Grades Management</h3>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#" onclick="showPage('defaultPage')">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Grades</li>
+    </ol>
+
+    <div class="d-flex gap-2 mb-3">
+      <button id="addGradeBtn" class="btn btn-primary">Add Grade</button>
+      <button id="editGradeBtn" class="btn btn-warning">Edit Grade</button>
+      <button id="deleteGradeBtn" class="btn btn-danger">Delete Grade</button>
+    </div>
+
+    <div id="gradeFormSection" class="card p-3 shadow-sm mb-3 d-none">
+      <input type="hidden" id="gradeDocId">
+      <div class="row">
+        <div class="col-md-3 mb-2"><label>Student ID</label><input id="gradeStudentId" class="form-control"></div>
+        <div class="col-md-3 mb-2"><label>Code</label><input id="gradeCode" class="form-control"></div>
+        <div class="col-md-3 mb-2"><label>Subject</label><input id="gradeName" class="form-control"></div>
+        <div class="col-md-3 mb-2"><label>Instructor</label><input id="gradeInstructor" class="form-control"></div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-md-3 mb-2"><label>Prelim</label><input id="gradePrelim" class="form-control" type="number" step="0.01"></div>
+        <div class="col-md-3 mb-2"><label>Midterm</label><input id="gradeMidterm" class="form-control" type="number" step="0.01"></div>
+        <div class="col-md-3 mb-2"><label>Final</label><input id="gradeFinal" class="form-control" type="number" step="0.01"></div>
+        <div class="col-md-3 mb-2"><label>Remark</label><input id="gradeRemark" class="form-control"></div>
+      </div>
+      <div class="mt-3">
+        <button id="saveGradeBtn" class="btn btn-success">Save</button>
+        <button id="updateGradeBtn" class="btn btn-warning d-none">Update</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered" id="gradesTable" style="width: 100%;">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAllGrades"></th>
+            <th>Student ID</th>
+            <th>Code</th>
+            <th>Subject</th>
+            <th>Instructor</th>
+            <th>Prelim</th>
+            <th>Midterm</th>
+            <th>Final</th>
+            <th>Remark</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+ 
+<div id="clearancePage" class="d-none container mt-4">
+  <h3>Clearance Management</h3>
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="#" onclick="showPage('defaultPage')">Home</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Clearance</li>
+  </ol>
+
+  <!-- Buttons -->
+  <div class="d-flex gap-2 mb-3">
+    <button id="addClearanceBtn" class="btn btn-primary">Add Clearance</button>
+    <button id="editClearanceBtn" class="btn btn-warning">Edit Clearance</button>
+    <button id="deleteClearanceBtn" class="btn btn-danger">Delete Clearance</button>
+  </div>
+
+  <!-- Form Section -->
+  <div id="clearanceFormSection" class="card p-3 shadow-sm mb-3 d-none">
+    <input type="hidden" id="clearanceDocId">
+    <div class="row">
+      <div class="col-md-4 mb-2">
+        <label>Student ID</label>
+        <input id="clearanceStudentId" class="form-control">
+      </div>
+      <div class="col-md-4 mb-2">
+        <label>Subject</label>
+        <input id="clearanceSubject" class="form-control">
+      </div>
+      <div class="col-md-4 mb-2">
+        <label>Instructor</label>
+        <input id="clearanceInstructor" class="form-control">
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-md-4 mb-2">
+        <label>Cleared</label>
+        <select id="clearanceCleared" class="form-select">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+      <div class="col-md-8 mb-2">
+        <label>Remarks</label>
+        <input id="clearanceRemarks" class="form-control">
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <button id="saveClearanceBtn" class="btn btn-success">Save</button>
+      <button id="updateClearanceBtn" class="btn btn-warning d-none">Update</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="d-flex justify-content-center">
+    <table class="table table-bordered" id="clearanceTable" style="width: 100%;">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAllClearance"></th>
+          <th>Student ID</th>
+          <th>Subject</th>
+          <th>Instructor</th>
+          <th>Cleared</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+    
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module" src="web-admin.js"></script>
+
+
+</body>
+</html>
