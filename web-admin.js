@@ -482,7 +482,7 @@ function setupDeleteStudent() {
 }
 
 
-async function loadAllRequests() {
+async function loadRequests() {
   const table = document.querySelector('#requestsTable tbody');
   if (!table) return;
   table.innerHTML = '';
