@@ -482,43 +482,148 @@ function setupDeleteStudent() {
 }
 
 
+async function loadAllRequests() {
+  const table = document.querySelector('#requestsTable tbody');
+  if (!table) return;
+  table.innerHTML = '';
 
-async function loadRequests() {
-	const table = document.querySelector('#requestsTable tbody');
-	if (!table) return;
-	table.innerHTML = '';
+  try {
+    if (window._adminRequestsUnsub) {
+      try { window._adminRequestsUnsub(); } catch (e) { }
+      window._adminRequestsUnsub = null;
+    }
+
+    const q = query(collection(db, 'Requests'));
+    window._adminRequestsUnsub = onSnapshot(q, (snap) => {
+      table.innerHTML = '';
+
+      snap.forEach(docSnap => {
+        const r = docSnap.data();
+        const status = r.status || 'Pending';
+        const pickupDate = r.pickupDate ? new Date(r.pickupDate) : null;
+        const today = new Date();
+
+        let colorClass = '';
+        let rowBg = '';
+
+        if (status === 'Pending') { colorClass = 'text-danger'; }
+        else if (status === 'Approved') { colorClass = 'text-success'; rowBg = 'table-success'; }
+        else if (status === 'Rejected') { colorClass = 'text-warning'; rowBg = 'table-warning'; }
+        else if (status === 'Claimed') { colorClass = 'text-primary'; rowBg = 'table-info'; }
 
 
+        let actionButtons = '';
 
-	if (window._requestsUnsub) {
-		try { window._requestsUnsub(); } catch(e){}
-		window._requestsUnsub = null;
-	}
+        if (status === 'Claimed') {
+      
+          actionButtons = `<span class="text-secondary fw-semibold">Claimed</span>`;
+        }
+        else if (status === 'Approved' && pickupDate && today >= pickupDate) {
+     
+          actionButtons = `
+            <button class="btn btn-sm btn-primary claim-request" data-id="${docSnap.id}">
+              Claim
+            </button>
+          `;
+        }
+        else if (status === 'Approved') {
+          
+          actionButtons = `
+            <button class="btn btn-sm btn-success" disabled>Approve</button>
+            <button class="btn btn-sm btn-warning reject-request" data-id="${docSnap.id}">Reject</button>
+            <button class="btn btn-sm btn-danger delete-request" data-id="${docSnap.id}">Delete</button>
+          `;
+        }
+        else {
+         
+          actionButtons = `
+            <button class="btn btn-sm btn-success approve-request" data-id="${docSnap.id}">Approve</button>
+            <button class="btn btn-sm btn-warning reject-request" data-id="${docSnap.id}">Reject</button>
+            <button class="btn btn-sm btn-danger delete-request" data-id="${docSnap.id}">Delete</button>
+          `;
+        }
 
-	const colRef = collection(db, 'Requests');
-	window._requestsUnsub = onSnapshot(colRef, (snap) => {
-		table.innerHTML = '';
-		snap.forEach(docSnap => {
-			const r = docSnap.data();
-			const status = r.status || 'Pending';
-			const tr = document.createElement('tr');
-			tr.innerHTML = `
-				<td>${r.studentId}</td>
-				<td>${r.name}</td>
-				<td>${r.requestType}</td>
-				<td>${status}</td>
-				<td>
-					<button class="btn btn-sm btn-success approve-request" data-id="${docSnap.id}">Approve</button>
-					<button class="btn btn-sm btn-warning claim-request" data-id="${docSnap.id}">Claim</button>
-					<button class="btn btn-sm btn-danger reject-request" data-id="${docSnap.id}">Reject</button>
-				</td>
-			`;
-			table.appendChild(tr);
-		});
-	}, (err) => {
-		console.error('Requests listener error', err);
-	});
+        const tr = document.createElement('tr');
+        tr.className = rowBg;
+        tr.innerHTML = `
+          <td>${r.studentId || ''}</td>
+          <td>${r.name || ''}</td>
+          <td>${r.requestType || ''}</td>
+          <td>${r.pickupDate || '-'}</td>
+          <td class="${colorClass} fw-bold">${status}</td>
+          <td>${actionButtons}</td>
+        `;
+        table.appendChild(tr);
+      });
+    }, (err) => console.error('Admin request listener error', err));
+  } catch (err) {
+    console.error('loadAllRequests error', err);
+  }
 }
+
+document.addEventListener('click', async (e) => {
+  if (e.target.classList.contains('claim-request')) {
+    const id = e.target.dataset.id;
+    try {
+      await updateDoc(doc(db, 'Requests', id), { status: 'Claimed' });
+      alert('Request has been claimed successfully!');
+    } catch (err) {
+      console.error('Claim request error:', err);
+    }
+  }
+});
+
+
+
+
+
+document.addEventListener('click', async (e) => {
+
+  if (e.target.classList.contains('approve-request')) {
+    const id = e.target.dataset.id;
+    try {
+      await updateDoc(doc(db, 'Requests', id), {
+        status: 'Approved',
+        updatedAt: new Date().toISOString()
+      });
+      alert('Request approved.');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to approve request.');
+    }
+  }
+
+
+  if (e.target.classList.contains('reject-request')) {
+    const id = e.target.dataset.id;
+    try {
+      await updateDoc(doc(db, 'Requests', id), {
+        status: 'Rejected',
+        updatedAt: new Date().toISOString()
+      });
+      alert('Request rejected.');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to reject request.');
+    }
+  }
+
+
+  if (e.target.classList.contains('delete-request')) {
+    const id = e.target.dataset.id;
+    if (!confirm('Delete this request?')) return;
+    try {
+      await deleteDoc(doc(db, 'Requests', id));
+      alert('Request deleted.');
+    } catch (err) {
+      console.error(err);
+      alert('Delete failed.');
+    }
+  }
+});
+
+document.addEventListener('DOMContentLoaded', loadAllRequests);
+
 
 
 document.addEventListener('click', async (e) => {
