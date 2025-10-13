@@ -784,8 +784,6 @@ link.click();
 image.src = img ? img.src : cvs.toDataURL('image/png');
 });
 
-
-
 async function loadGrades() {
 	const table = document.querySelector('#gradesTable tbody');
 	if (!table) return;
@@ -800,15 +798,18 @@ async function loadGrades() {
 				<td>${g.studentId || ''}</td>
 				<td>${g.code || ''}</td>
 				<td>${g.name || ''}</td>
-				<td>${g.instructor || ''}</td>
-				<td>${g.prelim ?? ''}</td>
-				<td>${g.midterm ?? ''}</td>
-				<td>${g.final ?? ''}</td>
+				<td>${g.teacher || ''}</td>
+				<td>${g.firstQuarter ?? ''}</td>
+				<td>${g.secondQuarter ?? ''}</td>
+				<td>${g.thirdQuarter ?? ''}</td>
+				<td>${g.fourthQuarter ?? ''}</td>
 				<td>${g.remark || ''}</td>
 			`;
 			table.appendChild(tr);
 		});
-	} catch (err) { console.error('loadGrades error', err); }
+	} catch (err) {
+		console.error('loadGrades error', err);
+	}
 }
 
 function setupGradesHandlers() {
@@ -816,7 +817,14 @@ function setupGradesHandlers() {
 		document.getElementById('gradeFormSection').classList.remove('d-none');
 		document.getElementById('saveGradeBtn').classList.remove('d-none');
 		document.getElementById('updateGradeBtn').classList.add('d-none');
-		['gradeDocId','gradeStudentId','gradeCode','gradeName','gradeInstructor','gradePrelim','gradeMidterm','gradeFinal','gradeRemark'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+		[
+			'gradeDocId','gradeStudentId','gradeCode','gradeName','gradeInstructor',
+			'gradeFirstQuarter','gradeSecondQuarter','gradeThirdQuarter','gradeFourthQuarter',
+			'gradeRemark'
+		].forEach(id => {
+			const el = document.getElementById(id);
+			if (el) el.value = '';
+		});
 	});
 
 	document.getElementById('saveGradeBtn')?.addEventListener('click', async () => {
@@ -824,32 +832,43 @@ function setupGradesHandlers() {
 			studentId: document.getElementById('gradeStudentId').value.trim(),
 			code: document.getElementById('gradeCode').value.trim(),
 			name: document.getElementById('gradeName').value.trim(),
-			instructor: document.getElementById('gradeInstructor').value.trim(),
-			prelim: parseFloat(document.getElementById('gradePrelim').value) || null,
-			midterm: parseFloat(document.getElementById('gradeMidterm').value) || null,
-			final: parseFloat(document.getElementById('gradeFinal').value) || null,
+			teacher: document.getElementById('gradeInstructor').value.trim(),
+			firstQuarter: parseFloat(document.getElementById('gradeFirstQuarter').value) || null,
+			secondQuarter: parseFloat(document.getElementById('gradeSecondQuarter').value) || null,
+			thirdQuarter: parseFloat(document.getElementById('gradeThirdQuarter').value) || null,
+			fourthQuarter: parseFloat(document.getElementById('gradeFourthQuarter').value) || null,
 			remark: document.getElementById('gradeRemark').value.trim(),
 			createdAt: new Date().toISOString()
 		};
-		if (!payload.studentId || !payload.code) return alert('Student ID and Code are required');
-		try { await addDoc(collection(db,'Grades'), payload); alert('Grade added'); document.getElementById('gradeFormSection').classList.add('d-none'); loadGrades(); } catch(e){console.error(e); alert('Failed to add grade');}
+		if (!payload.studentId || !payload.code)
+			return alert('Student ID and Code are required');
+		try {
+			await addDoc(collection(db, 'Grades'), payload);
+			alert('Grade added');
+			document.getElementById('gradeFormSection').classList.add('d-none');
+			loadGrades();
+		} catch (e) {
+			console.error(e);
+			alert('Failed to add grade');
+		}
 	});
 
 	document.getElementById('editGradeBtn')?.addEventListener('click', async () => {
 		const selected = Array.from(document.querySelectorAll('.grade-checkbox:checked'));
 		if (selected.length !== 1) return alert('Select exactly one grade to edit');
 		const docId = selected[0].value;
-		const snap = await getDoc(doc(db,'Grades',docId));
+		const snap = await getDoc(doc(db, 'Grades', docId));
 		if (!snap.exists()) return alert('Grade not found');
 		const g = snap.data();
 		document.getElementById('gradeDocId').value = docId;
 		document.getElementById('gradeStudentId').value = g.studentId || '';
 		document.getElementById('gradeCode').value = g.code || '';
 		document.getElementById('gradeName').value = g.name || '';
-		document.getElementById('gradeInstructor').value = g.instructor || '';
-		document.getElementById('gradePrelim').value = g.prelim ?? '';
-		document.getElementById('gradeMidterm').value = g.midterm ?? '';
-		document.getElementById('gradeFinal').value = g.final ?? '';
+		document.getElementById('gradeInstructor').value = g.teacher || '';
+		document.getElementById('gradeFirstQuarter').value = g.firstQuarter ?? '';
+		document.getElementById('gradeSecondQuarter').value = g.secondQuarter ?? '';
+		document.getElementById('gradeThirdQuarter').value = g.thirdQuarter ?? '';
+		document.getElementById('gradeFourthQuarter').value = g.fourthQuarter ?? '';
 		document.getElementById('gradeRemark').value = g.remark || '';
 		document.getElementById('gradeFormSection').classList.remove('d-none');
 		document.getElementById('saveGradeBtn').classList.add('d-none');
@@ -863,25 +882,78 @@ function setupGradesHandlers() {
 			studentId: document.getElementById('gradeStudentId').value.trim(),
 			code: document.getElementById('gradeCode').value.trim(),
 			name: document.getElementById('gradeName').value.trim(),
-			instructor: document.getElementById('gradeInstructor').value.trim(),
-			prelim: parseFloat(document.getElementById('gradePrelim').value) || null,
-			midterm: parseFloat(document.getElementById('gradeMidterm').value) || null,
-			final: parseFloat(document.getElementById('gradeFinal').value) || null,
+			teacher: document.getElementById('gradeInstructor').value.trim(),
+			firstQuarter: parseFloat(document.getElementById('gradeFirstQuarter').value) || null,
+			secondQuarter: parseFloat(document.getElementById('gradeSecondQuarter').value) || null,
+			thirdQuarter: parseFloat(document.getElementById('gradeThirdQuarter').value) || null,
+			fourthQuarter: parseFloat(document.getElementById('gradeFourthQuarter').value) || null,
 			remark: document.getElementById('gradeRemark').value.trim(),
 			updatedAt: new Date().toISOString()
 		};
-		try { await setDoc(doc(db,'Grades',docId), payload, {merge:true}); alert('Grade updated'); document.getElementById('gradeFormSection').classList.add('d-none'); loadGrades(); } catch(e){console.error(e); alert('Update failed'); }
+		try {
+			await setDoc(doc(db, 'Grades', docId), payload, { merge: true });
+			alert('Grade updated');
+			document.getElementById('gradeFormSection').classList.add('d-none');
+			loadGrades();
+		} catch (e) {
+			console.error(e);
+			alert('Update failed');
+		}
 	});
 
 	document.getElementById('deleteGradeBtn')?.addEventListener('click', async () => {
 		const selected = Array.from(document.querySelectorAll('.grade-checkbox:checked'));
 		if (selected.length === 0) return alert('Select at least one grade to delete');
 		if (!confirm('Delete selected grade(s)?')) return;
-		try { for (const s of selected) await deleteDoc(doc(db,'Grades', s.value)); alert('Deleted'); loadGrades(); } catch(e){console.error(e); alert('Delete failed'); }
+		try {
+			for (const s of selected)
+				await deleteDoc(doc(db, 'Grades', s.value));
+			alert('Deleted');
+			loadGrades();
+		} catch (e) {
+			console.error(e);
+			alert('Delete failed');
+		}
 	});
 
-	document.getElementById('selectAllGrades')?.addEventListener('change', function(){ document.querySelectorAll('.grade-checkbox').forEach(cb=>cb.checked = this.checked); });
+	document.getElementById('selectAllGrades')?.addEventListener('change', function () {
+		document.querySelectorAll('.grade-checkbox').forEach(cb => cb.checked = this.checked);
+	});
 }
+
+
+async function loadStudentIds() {
+  const dropdown = document.getElementById('studentIdDropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = '<li><span class="dropdown-item-text text-muted">Loading...</span></li>';
+  try {
+    const snap = await getDocs(collection(db, 'Students'));
+    dropdown.innerHTML = '';
+
+    snap.forEach(docSnap => {
+      const s = docSnap.data();
+      const li = document.createElement('li');
+      li.innerHTML = `<a class="dropdown-item" href="#">${s.id || '(no ID)'} - ${s.name || ''}</a>`;
+      li.addEventListener('click', () => {
+        document.getElementById('gradeStudentId').value = s.id || '';
+      });
+      dropdown.appendChild(li);
+    });
+
+    if (dropdown.innerHTML.trim() === '') {
+      dropdown.innerHTML = '<li><span class="dropdown-item-text text-muted">No students found</span></li>';
+    }
+  } catch (e) {
+    console.error('loadStudentIds error', e);
+    dropdown.innerHTML = '<li><span class="dropdown-item-text text-danger">Failed to load</span></li>';
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', loadStudentIds);
+
+
 
 
 async function loadClearance() {
@@ -969,3 +1041,33 @@ function setupClearanceHandlers() {
 	document.getElementById('selectAllClearance')?.addEventListener('change', function(){ document.querySelectorAll('.clearance-checkbox').forEach(cb=>cb.checked = this.checked); });
 }
 
+async function loadClearanceStudentIds() {
+  const dropdown = document.getElementById('clearanceIdDropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = '<li><span class="dropdown-item-text text-muted">Loading...</span></li>';
+  try {
+    const snap = await getDocs(collection(db, 'Students'));
+    dropdown.innerHTML = '';
+
+    snap.forEach(docSnap => {
+      const s = docSnap.data();
+      const li = document.createElement('li');
+      li.innerHTML = `<a class="dropdown-item" href="#">${s.id || '(no ID)'} - ${s.name || ''}</a>`;
+      li.addEventListener('click', () => {
+        document.getElementById('clearanceStudentId').value = s.id || '';
+      });
+      dropdown.appendChild(li);
+    });
+
+    if (dropdown.innerHTML.trim() === '') {
+      dropdown.innerHTML = '<li><span class="dropdown-item-text text-muted">No students found</span></li>';
+    }
+  } catch (e) {
+    console.error('loadClearanceStudentIds error', e);
+    dropdown.innerHTML = '<li><span class="dropdown-item-text text-danger">Failed to load</span></li>';
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', loadClearanceStudentIds);
