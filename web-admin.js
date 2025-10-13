@@ -622,7 +622,7 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', loadAllRequests);
+document.addEventListener('DOMContentLoaded', loadRequests);
 
 
 
@@ -1027,6 +1027,7 @@ function setupGradesHandlers() {
 }
 
 
+
 async function loadStudentIds() {
   const dropdown = document.getElementById('studentIdDropdown');
   if (!dropdown) return;
@@ -1038,8 +1039,10 @@ async function loadStudentIds() {
 
     snap.forEach(docSnap => {
       const s = docSnap.data();
+
+      const fullName = `${s.firstName || ''} ${s.lastName || ''}`.trim();
       const li = document.createElement('li');
-      li.innerHTML = `<a class="dropdown-item" href="#">${s.id || '(no ID)'} - ${s.name || ''}</a>`;
+      li.innerHTML = `<a class="dropdown-item" href="#">${s.id || '(no ID)'} - ${fullName}</a>`;
       li.addEventListener('click', () => {
         document.getElementById('gradeStudentId').value = s.id || '';
       });
@@ -1055,9 +1058,7 @@ async function loadStudentIds() {
   }
 }
 
-
 document.addEventListener('DOMContentLoaded', loadStudentIds);
-
 
 
 
@@ -1146,6 +1147,8 @@ function setupClearanceHandlers() {
 	document.getElementById('selectAllClearance')?.addEventListener('change', function(){ document.querySelectorAll('.clearance-checkbox').forEach(cb=>cb.checked = this.checked); });
 }
 
+
+
 async function loadClearanceStudentIds() {
   const dropdown = document.getElementById('clearanceIdDropdown');
   if (!dropdown) return;
@@ -1157,8 +1160,9 @@ async function loadClearanceStudentIds() {
 
     snap.forEach(docSnap => {
       const s = docSnap.data();
+      const fullName = `${s.firstName || ''} ${s.lastName || ''}`.trim();
       const li = document.createElement('li');
-      li.innerHTML = `<a class="dropdown-item" href="#">${s.id || '(no ID)'} - ${s.name || ''}</a>`;
+      li.innerHTML = `<a class="dropdown-item" href="#">${s.id || '(no ID)'} - ${fullName}</a>`;
       li.addEventListener('click', () => {
         document.getElementById('clearanceStudentId').value = s.id || '';
       });
@@ -1173,6 +1177,5 @@ async function loadClearanceStudentIds() {
     dropdown.innerHTML = '<li><span class="dropdown-item-text text-danger">Failed to load</span></li>';
   }
 }
-
 
 document.addEventListener('DOMContentLoaded', loadClearanceStudentIds);
