@@ -147,7 +147,7 @@
       <button id="searchButton" class="btn btn-primary">Search</button>
     </div>
 
-    <!-- Responsive Table -->
+
     <div class="card shadow-sm">
       <div class="card-body">
         <h5 class="card-title">Student List</h5>
@@ -310,17 +310,28 @@
     <div id="gradeFormSection" class="card p-3 shadow-sm mb-3 d-none">
       <input type="hidden" id="gradeDocId">
       <div class="row">
-        <div class="col-md-3 mb-2"><label>Student ID</label><input id="gradeStudentId" class="form-control"></div>
+       <div class="col-md-3">
+  <label class="form-label">Student ID</label>
+  <div class="input-group">
+    <input type="text" id="gradeStudentId" class="form-control" placeholder="Enter or select ID">
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="studentIdDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+      Select
+    </button>
+    <ul class="dropdown-menu" id="studentIdDropdown"></ul>
+  </div>
+</div>
         <div class="col-md-3 mb-2"><label>Code</label><input id="gradeCode" class="form-control"></div>
         <div class="col-md-3 mb-2"><label>Subject</label><input id="gradeName" class="form-control"></div>
-        <div class="col-md-3 mb-2"><label>Instructor</label><input id="gradeInstructor" class="form-control"></div>
+        <div class="col-md-3 mb-2"><label>Teacher</label><input id="gradeInstructor" class="form-control"></div>
       </div>
-      <div class="row mt-2">
-        <div class="col-md-3 mb-2"><label>Prelim</label><input id="gradePrelim" class="form-control" type="number" step="0.01"></div>
-        <div class="col-md-3 mb-2"><label>Midterm</label><input id="gradeMidterm" class="form-control" type="number" step="0.01"></div>
-        <div class="col-md-3 mb-2"><label>Final</label><input id="gradeFinal" class="form-control" type="number" step="0.01"></div>
-        <div class="col-md-3 mb-2"><label>Remark</label><input id="gradeRemark" class="form-control"></div>
-      </div>
+<div class="row mt-2">
+  <div class="col-md-2 mb-2"><label>1st Quarter</label><input id="gradeFirstQuarter" class="form-control" type="number" step="0.01"></div>
+  <div class="col-md-2 mb-2"><label>2nd Quarter</label><input id="gradeSecondQuarter" class="form-control" type="number" step="0.01"></div>
+  <div class="col-md-2 mb-2"><label>3rd Quarter</label><input id="gradeThirdQuarter" class="form-control" type="number" step="0.01"></div>
+  <div class="col-md-2 mb-2"><label>4th Quarter</label><input id="gradeFourthQuarter" class="form-control" type="number" step="0.01"></div>
+  <div class="col-md-2 mb-2"><label>Remark</label><input id="gradeRemark" class="form-control"></div>
+</div>
+
       <div class="mt-3">
         <button id="saveGradeBtn" class="btn btn-success">Save</button>
         <button id="updateGradeBtn" class="btn btn-warning d-none">Update</button>
@@ -329,19 +340,21 @@
 
     <div class="table-responsive">
       <table class="table table-bordered" id="gradesTable" style="width: 100%;">
-        <thead>
-          <tr>
-            <th><input type="checkbox" id="selectAllGrades"></th>
-            <th>Student ID</th>
-            <th>Code</th>
-            <th>Subject</th>
-            <th>Instructor</th>
-            <th>Prelim</th>
-            <th>Midterm</th>
-            <th>Final</th>
-            <th>Remark</th>
-          </tr>
-        </thead>
+   <thead>
+  <tr>
+    <th><input type="checkbox" id="selectAllGrades"></th>
+    <th>Student ID</th>
+    <th>Code</th>
+    <th>Subject</th>
+    <th>Teacher</th>
+    <th>1st Quarter</th>
+    <th>2nd Quarter</th>
+    <th>3rd Quarter</th>
+    <th>4th Quarter</th>
+    <th>Remark</th>
+  </tr>
+</thead>
+
         <tbody></tbody>
       </table>
     </div>
@@ -357,27 +370,34 @@
     <li class="breadcrumb-item active" aria-current="page">Clearance</li>
   </ol>
 
-  <!-- Buttons -->
+
   <div class="d-flex gap-2 mb-3">
     <button id="addClearanceBtn" class="btn btn-primary">Add Clearance</button>
     <button id="editClearanceBtn" class="btn btn-warning">Edit Clearance</button>
     <button id="deleteClearanceBtn" class="btn btn-danger">Delete Clearance</button>
   </div>
 
-  <!-- Form Section -->
+
   <div id="clearanceFormSection" class="card p-3 shadow-sm mb-3 d-none">
     <input type="hidden" id="clearanceDocId">
     <div class="row">
-      <div class="col-md-4 mb-2">
-        <label>Student ID</label>
-        <input id="clearanceStudentId" class="form-control">
-      </div>
+     <div class="col-md-4 mb-2">
+  <label>Student ID</label>
+  <div class="input-group">
+    <input type="text" id="clearanceStudentId" class="form-control" placeholder="Enter or select ID">
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="clearanceIdDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+      Select
+    </button>
+    <ul class="dropdown-menu" id="clearanceIdDropdown"></ul>
+  </div>
+</div>
+
       <div class="col-md-4 mb-2">
         <label>Subject</label>
         <input id="clearanceSubject" class="form-control">
       </div>
       <div class="col-md-4 mb-2">
-        <label>Instructor</label>
+        <label>Teacher</label>
         <input id="clearanceInstructor" class="form-control">
       </div>
     </div>
@@ -402,7 +422,7 @@
     </div>
   </div>
 
-  <!-- Table -->
+
   <div class="d-flex justify-content-center">
     <table class="table table-bordered" id="clearanceTable" style="width: 100%;">
       <thead>
@@ -410,7 +430,7 @@
           <th><input type="checkbox" id="selectAllClearance"></th>
           <th>Student ID</th>
           <th>Subject</th>
-          <th>Instructor</th>
+          <th>Teacher</th>
           <th>Cleared</th>
           <th>Remarks</th>
         </tr>
