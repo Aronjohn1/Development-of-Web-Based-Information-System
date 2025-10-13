@@ -310,42 +310,56 @@ async function renderGradesView() {
       <strong class="me-3">Loading grades...</strong>
       <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
     </div>`;
-  if (!student?.id) return container.innerHTML = '<div class="alert alert-warning">Please login to view grades.</div>';
+
+  if (!student?.id) {
+    container.innerHTML = '<div class="alert alert-warning">Please login to view grades.</div>';
+    return;
+  }
+
   try {
     const q = query(collection(db, 'Grades'), where('studentId', '==', student.id));
     const snap = await getDocs(q);
-let html = `<h4>Grade ${student.strand || ''}</h4>`;
-html += `<div class="table-responsive">
-           <table class="table table-bordered mt-3">
-             <thead>
-               <tr>
-                 <th>Code</th><th>Name</th><th>Instructor</th>
-                 <th>Prelim</th><th>Midterm</th><th>Final</th><th>Remark</th>
-               </tr>
-             </thead>
-             <tbody>`;
 
-snap.forEach(d => {
-  const r = d.data();
-  html += `<tr>
-             <td>${r.code || ''}</td>
-             <td>${r.name || ''}</td>
-             <td>${r.instructor || ''}</td>
-             <td>${r.prelim || ''}</td>
-             <td>${r.midterm || ''}</td>
-             <td>${r.final || ''}</td>
-             <td>${r.remark || ''}</td>
-           </tr>`;
-});
+      let html = `<div class="card p-3"><h4>Grades ${student.strand || ''}</h4>`;
+    html += `<div class="table-responsive">
+               <table class="table table-bordered mt-3">
+                 <thead class="table-primary">
+                   <tr>
+                     <th>Code</th>
+                     <th>Subject Name</th>
+                     <th>Teacher</th>
+                     <th>1st Quarter</th>
+                     <th>2nd Quarter</th>
+                     <th>3rd Quarter</th>
+                     <th>4th Quarter</th>
+                     <th>Remark</th>
+                   </tr>
+                 </thead>
+                 <tbody>`;
 
-html += `</tbody></table></div>`; // end table-responsive
-container.innerHTML = html;
+    snap.forEach(d => {
+      const r = d.data();
+      html += `<tr>
+                 <td>${r.code || ''}</td>
+                 <td>${r.name || ''}</td>
+                 <td>${r.teacher || r.instructor || ''}</td>
+                 <td>${r.firstQuarter || r.prelim || ''}</td>
+                 <td>${r.secondQuarter || r.midterm || ''}</td>
+                 <td>${r.thirdQuarter || ''}</td>
+                 <td>${r.fourthQuarter || ''}</td>
+                 <td>${r.remark || ''}</td>
+               </tr>`;
+    });
+
+    html += `</tbody></table></div>`;
+    container.innerHTML = html;
 
   } catch (e) {
     console.error('renderGradesView error', e);
     container.innerHTML = '<div class="alert alert-danger">Failed to load grades.</div>';
   }
 }
+
 
 
 function renderPersonalView() {
@@ -431,9 +445,9 @@ async function renderClearanceView() {
     let html = `<div class="card p-3"><h5>Grade ${student.strand || ''}</h5>`;
     html += `<div class="table-responsive">
                <table class="table table-bordered mt-3">
-                 <thead>
+                   <thead class="table-primary">
                    <tr>
-                     <th>Subject</th><th>Instructor</th><th>Status</th><th>Remarks</th>
+                     <th>Subject</th><th>Teacher</th><th>Status</th><th>Remarks</th>
                    </tr>
                  </thead>
                  <tbody>`;
