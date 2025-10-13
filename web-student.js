@@ -575,56 +575,128 @@ async function submitServiceRequest(type) {
   const student = JSON.parse(sessionStorage.getItem('loggedInStudent') || '{}');
   if (!student?.id) return alert('You must be logged in to submit a request');
 
+  const pickupDateInput = document.getElementById('pickupDate');
+  const pickupDate = pickupDateInput?.value || '';
+
+  if (!type) return alert('Please select a request type.');
+  if (!pickupDate) return alert('Please select a pickup date.');
+
+
   const q = query(
-    collection(db,'Requests'),
-    where('studentId','==', student.id),
-    where('requestType','==', type)
+    collection(db, 'Requests'),
+    where('studentId', '==', student.id),
+    where('requestType', '==', type)
   );
   const snapshot = await getDocs(q);
   let hasActive = false;
   snapshot.forEach(s => {
     const r = s.data();
- 
     if (!r.status || r.status !== 'Rejected') hasActive = true;
   });
   if (hasActive) return alert('You already have a pending/active request of this type.');
 
-  await addDoc(collection(db,'Requests'), { studentId: student.id, name: student.name, requestType: type, status: 'Pending', createdAt: new Date().toISOString() });
+
+  await addDoc(collection(db, 'Requests'), {
+    studentId: student.id,
+    name: student.name,
+    requestType: type,
+    pickupDate: pickupDate,
+    status: 'Pending',
+    createdAt: new Date().toISOString()
+  });
+
   alert('Request submitted. Status: Pending');
+  pickupDateInput.value = '';
   loadMyRequests();
 }
+
 
 
 async function loadMyRequests() {
   const table = document.querySelector('#myRequestsTable tbody');
   if (!table) return;
   table.innerHTML = '';
+
   const student = JSON.parse(sessionStorage.getItem('loggedInStudent') || '{}');
   if (!student?.id) return;
 
   try {
+    if (window._myRequestsUnsub) {
+      try { window._myRequestsUnsub(); } catch (e) {}
+      window._myRequestsUnsub = null;
+    }
 
-    if (window._myRequestsUnsub) { try { window._myRequestsUnsub(); } catch(e){}; window._myRequestsUnsub = null; }
-    const q = query(collection(db,'Requests'), where('studentId','==', student.id));
+    const q = query(collection(db, 'Requests'), where('studentId', '==', student.id));
     window._myRequestsUnsub = onSnapshot(q, (snap) => {
       table.innerHTML = '';
       snap.forEach(docSnap => {
         const r = docSnap.data();
         const status = r.status || 'Pending';
+        const pickupDate = r.pickupDate ? new Date(r.pickupDate) : null;
+        const today = new Date();
+        let actionHTML = '';
+
+
+        if (status === 'Pending') {
+
+          actionHTML = `<button class="btn btn-sm btn-outline-danger delete-my-request" data-id="${docSnap.id}">Delete</button>`;
+        } else if (status === 'Approved') {
+
+          if (pickupDate) {
+            if (today < pickupDate) {
+   
+              actionHTML = `<span class="badge bg-warning text-dark">Processing</span>`;
+            } else if (today.toDateString() === pickupDate.toDateString()) {
+   
+              actionHTML = `<button class="btn btn-sm btn-success claim-request" data-id="${docSnap.id}">Claim</button>`;
+            } else if (today > pickupDate) {
+          
+              actionHTML = `<span class="badge bg-primary">Upcoming</span>`;
+            }
+          } else {
+            actionHTML = `<span class="badge bg-secondary">Awaiting Date</span>`;
+          }
+        } else if (status === 'Claimed') {
+
+          actionHTML = `<span class="badge bg-success">Claimed</span>`;
+        } else if (status === 'Rejected') {
+          actionHTML = `<span class="badge bg-danger">Rejected</span>`;
+        }
+
+
         let colorClass = '';
         if (status === 'Pending') colorClass = 'text-danger';
         else if (status === 'Approved') colorClass = 'text-success';
         else if (status === 'Rejected') colorClass = 'text-warning';
+        else if (status === 'Claimed') colorClass = 'text-success fw-bold';
+
+    
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${r.requestType}</td>
           <td class="${colorClass}">${status}</td>
-          <td><button class="btn btn-sm btn-outline-danger delete-my-request" data-id="${docSnap.id}">Delete</button></td>
+          <td>${r.pickupDate || '-'}</td>
+          <td>${actionHTML}</td>
         `;
+
         table.appendChild(tr);
       });
     }, (err) => console.error('My requests listener error', err));
-  } catch (e) { console.error(e); }
+
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+
+const requestTypeSelect = document.getElementById('requestType');
+const pickupDateContainer = document.getElementById('pickupDateContainer');
+
+if (requestTypeSelect) {
+  requestTypeSelect.addEventListener('change', () => {
+    if (requestTypeSelect.value) pickupDateContainer.classList.remove('d-none');
+    else pickupDateContainer.classList.add('d-none');
+  });
 }
 
 
